@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ভাই ভাই সমিতি - দ্রুত কিস্তি গ্রহণের পোর্টাল</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome CDN for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Animate.css for subtle loading transitions -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <!-- Google Fonts: Hind Siliguri (Standard elegant Bengali font) -->
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@405;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-50 text-slate-850 min-h-screen flex flex-col md:flex-row pb-20 md:pb-0">
+
+  <!-- DYNAMIC STATS / SERVER SYNCING SPINNER -->
+  <div id="syncIndicator" class="fixed top-2 right-2 bg-emerald-700 text-white text-xs px-3 py-1.5 rounded-full shadow-lg items-center gap-1.5 z-50 animate-pulse hidden">
+    <div class="w-2 h-2 rounded-full bg-white animate-ping"></div>
+    <span>সার্ভার সিঙ্ক হচ্ছে...</span>
+  </div>
+
+  <!-- DESKTOP SIDEBAR -->
+  <aside class="hidden md:flex flex-col w-72 bg-emerald-900 text-emerald-50 shrink-0 border-r border-emerald-950 shadow-2xl relative">
+    <div class="p-6 border-b border-emerald-805 bg-emerald-950 flex items-center gap-3">
+      <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center shrink-0 border border-emerald-400/30">
+        <svg viewBox="0 0 100 100" class="w-9 h-9 text-emerald-400 fill-current">
+          <circle cx="50" cy="50" r="45" stroke="currentColor" stroke-width="4" fill="none" class="opacity-40" />
+          <path d="M35,45 C35,60 65,60 65,45 C65,35 75,35 65,30 C60,35 40,35 35,30 C25,35 35,35 35,45 Z" fill="currentColor" />
+        </svg>
+      </div>
+      <div>
+        <h1 class="text-xl font-bold tracking-tight text-white leading-snug">ভাই ভাই সমিতি</h1>
+        <p class="text-xs text-emerald-300 font-medium font-siliguri">দ্রুত কিস্তি গ্রহণের পোর্টাল</p>
+      </div>
+    </div>
+
+    <!-- PRESIDENT INFORMATION -->
+    <div class="p-4 mx-4 my-3 bg-emerald-950/60 rounded-xl border border-emerald-800/40 text-xs">
+      <div class="flex items-center gap-2 mb-2">
+        <div class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold">স</div>
+        <div>
+          <p class="font-semibold text-emerald-305 text-emerald-300">সভাপতিঃ জায়দুল হাসান</p>
+          <p class="text-emerald-400 font-mono">01626972980</p>
+        </div>
+      </div>
+      <p class="text-[10px] text-emerald-400/75 border-t border-emerald-800/60 pt-2 text-center">ক্যাশিয়ার ড্যাশবোর্ড (পাসওয়ার্ড কোডঃ ৯৭২৯৮০)</p>
+    </div>
+
+    <!-- NAVIGATION TABS -->
+    <nav class="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto">
+      <button onclick="switchTab('dashboard')" id="btn-dash-desktop" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-150 bg-emerald-700 text-white shadow-md">
+        <i class="fa-solid fa-house text-emerald-300"></i>
+        <span>🏠 ড্যাশবোর্ড</span>
+      </button>
+
+      <button onclick="switchTab('members')" id="btn-members-desktop" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-150 text-emerald-100 hover:bg-emerald-800">
+        <i class="fa-solid fa-users text-emerald-300"></i>
+        <span>👥 সদস্য তালিকা</span>
+      </button>
+
+      <button onclick="switchTab('payments')" id="btn-payments-desktop" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-150 text-emerald-100 hover:bg-emerald-800">
+        <i class="fa-solid fa-receipt text-emerald-300"></i>
+        <span>💰 কিস্তি পরিশোধ</span>
+      </button>
+
+      <button onclick="switchTab('reports')" id="btn-reports-desktop" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-150 text-emerald-100 hover:bg-emerald-800">
+        <i class="fa-solid fa-chart-pie text-emerald-300"></i>
+        <span>📋 বকেয়া ও রিপোর্ট</span>
+      </button>
+
+      <button onclick="switchTab('progress')" id="btn-progress-desktop" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-150 text-emerald-100 hover:bg-emerald-800">
+        <i class="fa-solid fa-cow text-emerald-300"></i>
+        <span>📈 লক্ষ্য ও অগ্রগতি</span>
+      </button>
+    </nav>
+  </aside>
+
+  <!-- MOBILE HEADER -->
+  <header class="md:hidden bg-emerald-950 text-white p-4 sticky top-0 z-40 shadow-md flex items-center justify-between border-b border-emerald-800">
+    <div class="flex items-center gap-2">
+      <div class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center border border-emerald-400/20">
+        <svg viewBox="0 0 100 100" class="w-6 h-6 text-emerald-400 fill-current">
+          <circle cx="50" cy="50" r="45" stroke="currentColor" stroke-width="3" fill="none" class="opacity-40" />
+          <path d="M35,45 C35,60 65,60 65,45 C65,35 75,35 65,30 C60,35 40,35 35,30 C25,35 35,35 35,45 Z" fill="currentColor" />
+        </svg>
+      </div>
+      <div>
+        <h1 class="text-md font-bold text-white leading-tight">ভাই ভাই সমিতি</h1>
+        <p class="text-[10px] text-emerald-305 text-emerald-300">দ্রুত কিস্তি পোর্টাল</p>
+      </div>
+    </div>
+    <div class="text-right">
+      <p class="text-xs text-emerald-300 font-semibold">সভাপতিঃ জায়দুল হাসান</p>
+      <a href="tel:01626972980" class="text-[10px] font-mono text-emerald-400 bg-emerald-900 px-2 py-0.5 rounded inline-block mt-0.5">📞 ০১৬২৬৯৭২৯৮০</a>
+    </div>
+  </header>
+
+  <!-- MAIN BODY -->
+  <main class="flex-1 p-4 md:p-8 overflow-y-auto">
+
+    <!-- SOCIETY TARGET MISSION BANNER -->
+    <section class="mb-6 bg-white rounded-2xl border border-emerald-100 shadow-sm overflow-hidden flex flex-col lg:flex-row divide-y lg:divide-y-0 lg:divide-x divide-emerald-100">
+      <div class="p-6 flex-1 bg-gradient-to-r from-emerald-50/20 via-white to-white">
+        <div class="flex items-start gap-3">
+          <span class="p-2 rounded-xl bg-emerald-50 text-emerald-700 shrink-0">
+            <i class="fa-solid fa-lightbulb text-emerald-600"></i>
+          </span>
+          <div>
+            <h3 class="text-xs font-bold text-emerald-800 uppercase tracking-widest mb-1 font-mono">সমিতির মূল লক্ষ্য</h3>
+            <p class="text-sm md:text-base text-slate-705 text-slate-750 leading-relaxed font-semibold">
+              আমাদের মূল লক্ষ্য <span id="mission-member-count" class="text-emerald-750 text-lg font-extrabold underline decoration-emerald-200">০</span> জন সদস্য ও শুভানুধ্যায়ীদের যৌথ সঞ্চয় <span id="mission-total-saving" class="text-emerald-750 text-lg font-extrabold underline decoration-emerald-200">০</span> টাকা সংগ্রহ করে একটি পুষ্টিকর গরু ক্রয় করা।
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="p-6 max-w-sm shrink-0 bg-slate-50/50 text-xs">
+        <h3 class="text-xs font-bold text-slate-500 uppercase mb-2.5">সমিতি গাইডলাইন ও বিকাশ</h3>
+        <div class="space-y-1.5">
+          <p class="flex justify-between font-semibold"><span class="text-slate-500">মাসিক কিস্তিঃ</span> <span class="text-emerald-720 text-emerald-700">৬০০ টাকা / শেয়ার</span></p>
+          <p class="flex justify-between font-semibold"><span class="text-slate-500">বিকাশ নম্বরঃ</span> <span class="font-mono bg-amber-100 text-amber-900 px-2 rounded">01976972980</span></p>
+          <div class="p-2 bg-emerald-50/65 rounded border border-emerald-100 text-[10px] text-emerald-950 mt-1 font-siliguri leading-normal">
+            📌 বিকাশে টাকা পাঠানোর পর স্ক্রিনশট পোর্টালে জমা দিন। ট্রানজেকশন আইডি বা রেফারেন্স আইডি দেওয়ার প্রয়োজন নেই।
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 1: DASHBOARD -->
+    <section id="tab-dashboard" class="tab-content space-y-6">
+      
+      <!-- BENTO SUMMARY STATS GRID -->
+      <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
+        
+        <div class="bg-white p-4.5 rounded-xl border border-slate-100 shadow-sm flex flex-col justify-between">
+          <div class="flex justify-between items-start mb-2">
+            <span class="p-2 rounded-lg bg-emerald-50 text-emerald-700"><i class="fa-solid fa-users"></i></span>
+            <span class="text-[9px] bg-slate-100 text-slate-600 px-2 rounded">সদস্য</span>
+          </div>
+          <div>
+            <p class="text-xs text-slate-500">মোট সক্রিয় সদস্য</p>
+            <p id="stat-active-members-count" class="text-lg md:text-xl font-bold font-mono text-emerald-950">0 জন</p>
+          </div>
+        </div>
+
+        <div class="bg-white p-4.5 rounded-xl border border-slate-100 shadow-sm flex flex-col justify-between">
+          <div class="flex justify-between items-start mb-2">
+            <span class="p-2 rounded-lg bg-emerald-50 text-emerald-700"><i class="fa-solid fa-chart-line"></i></span>
+            <span class="text-[9px] bg-emerald-100 text-emerald-800 px-2 rounded">শেয়ার</span>
+          </div>
+          <div>
+            <p class="text-xs text-slate-500">মোট নথিভুক্ত শেয়ার</p>
+            <p id="stat-total-shares-count" class="text-lg md:text-xl font-bold font-mono text-emerald-950">0 টি</p>
+          </div>
+        </div>
+
+        <div class="bg-white p-4.5 rounded-xl border border-slate-100 shadow-sm flex flex-col justify-between">
+          <div class="flex justify-between items-start mb-2">
+            <span class="p-2 rounded-lg bg-blue-50 text-blue-700"><i class="fa-solid fa-hand-holding-dollar"></i></span>
+            <span class="text-[9px] bg-blue-105 text-blue-800 px-2 rounded">মাসিক</span>
+          </div>
+          <div>
+            <p class="text-xs text-slate-500">মাসিক ম্যাপড সম্ভাবনা</p>
+            <p id="stat-monthly-expected" class="text-lg md:text-xl font-bold font-mono text-blue-950">0 ৳</p>
+          </div>
+        </div>
+
+        <div class="bg-white p-4.5 rounded-xl border border-slate-100 shadow-sm flex flex-col justify-between">
+          <div class="flex justify-between items-start mb-2">
+            <span class="p-2 rounded-lg bg-emerald-50 text-emerald-800"><i class="fa-solid fa-vault"></i></span>
+            <span class="text-[9px] bg-emerald-100 text-emerald-800 px-2 rounded">সংগৃহীত</span>
+          </div>
+          <div>
+            <p class="text-xs text-slate-500">মোট সংগৃহীত সঞ্চয়</p>
+            <p id="stat-total-collected" class="text-lg md:text-xl font-bold font-mono text-emerald-950">0 ৳</p>
+          </div>
+        </div>
+
+        <div class="bg-white p-4.5 rounded-xl border border-slate-100 shadow-sm flex flex-col justify-between col-span-2 lg:col-span-1">
+          <div class="flex justify-between items-start mb-2">
+            <span class="p-2 rounded-lg bg-red-50 text-red-750"><i class="fa-solid fa-triangle-exclamation"></i></span>
+            <span class="text-[9px] bg-red-101 text-red-800 px-2 rounded">বকেয়া</span>
+          </div>
+          <div>
+            <p class="text-xs text-slate-500">মোট বকেয়া কিস্তি</p>
+            <p id="stat-total-due" class="text-lg md:text-xl font-bold font-mono text-red-650">0 ৳</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ACTIVE MONTH PICKER FOR TESTING OR OFFICIATING DUES -->
+      <div class="p-4 bg-emerald-50 rounded-xl border border-emerald-100 flex flex-wrap items-center justify-between gap-4 text-xs font-semibold text-emerald-950">
+        <div class="flex items-center gap-2">
+          <span class="bg-emerald-700 text-white rounded-full px-2 py-0.5 text-[10px]">টেস্ট কন্ট্রোল</span>
+          <p>বকেয়া ও লক্ষ্য গণনার জন্য সর্বশেষ সক্রিয় কিস্তির মাস সিলেক্ট করুনঃ</p>
+        </div>
+        <select id="config-active-month" class="bg-white p-1.5 px-3 rounded-lg border border-slate-250 focus:outline-none">
+          <!-- Populated from script -->
+        </select>
+      </div>
+
+      <!-- MIDDLE DOCK: COW FUND GOAL METER & QUICK STATISTICS -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Cow Goal visual card -->
+        <div class="bg-white p-6 rounded-2xl border border-emerald-100 shadow-sm lg:col-span-2 flex flex-col justify-between">
+          <div class="flex justify-between items-center mb-4">
+            <div>
+              <h4 class="text-xs font-bold text-slate-400 mb-1 uppercase tracking-wider">গরু ক্রয়ের লক্ষ্য তহবিল</h4>
+              <p class="text-md font-bold text-slate-800">মোট সঞ্চয় লক্ষ্যমাত্রাঃ <span id="cow-target-txt" class="font-mono text-emerald-800 font-black">০ ৳</span></p>
+            </div>
+            <span class="text-[10px] bg-yellow-50 text-amber-800 border border-amber-200 px-2.5 py-1 rounded-full font-bold">১০ মাসের সংগ্রীহিত শেয়ার অনুপাত</span>
+          </div>
+
+          <div class="bg-emerald-50/50 rounded-xl p-5 border border-emerald-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="relative shrink-0">
+              <!-- Visual circular progress -->
+              <svg viewBox="0 0 100 100" class="w-20 h-20 text-emerald-800 fill-current">
+                <circle cx="50" cy="50" r="45" stroke="#f1f5f9" stroke-width="4" fill="white" />
+                <path d="M30,55 C30,70 70,70 70,55 C70,45 80,45 70,40 C65,45 35,45 30,40 C20,45 30,45 30,55 Z" class="text-emerald-600" />
+              </svg>
+              <div id="cow-progress-badge" class="absolute -bottom-1 -right-1 bg-amber-500 font-mono text-white px-2 py-0.5 rounded-full text-[9px] font-bold">০%</div>
+            </div>
+            
+            <div class="flex-1 w-full space-y-2 text-xs">
+              <div class="flex justify-between"><span>আদায়ের অগ্রগতিঃ</span> <span id="cow-progress-collected" class="font-bold text-emerald-800 font-mono">০ ৳</span></div>
+              <div class="flex justify-between"><span>অবশিষ্ট কিস্তি চাহিদাঃ</span> <span id="cow-progress-remaining" class="font-bold text-amber-700 font-mono">০ ৳</span></div>
+              <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                <div id="cow-progress-bar" class="h-full bg-emerald-600 rounded-full transition-all duration-300" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-2 text-center text-[11px] font-medium text-slate-600 mt-4 pt-3 border-t">
+            <div><p class="text-slate-400">প্রতি শেয়ার গড় আদায়</p><p id="txt-avg-saving-share" class="font-bold text-slate-800">০ ৳</p></div>
+            <div><p class="text-slate-400">মোট সক্রিয় মাস সংখ্যা</p><p id="txt-active-months-count" class="font-bold text-slate-800">০ মাস</p></div>
+            <div><p class="text-slate-400">বার্ষিক প্রাক্কলিত আদায়</p><p id="txt-annual-estimated" class="font-bold text-slate-800">০ ৳</p></div>
+          </div>
+        </div>
+
+        <!-- Metric details -->
+        <div class="bg-white p-6 rounded-2xl border border-emerald-100 shadow-sm flex flex-col justify-between text-xs">
+          <div>
+            <h4 class="text-xs font-bold text-slate-400 mb-3 uppercase tracking-wider">কিস্তি আদায় রেশিও</h4>
+            
+            <div class="space-y-4">
+              <div>
+                <p class="flex justify-between text-slate-600 mb-1">আদায়কৃত কিস্তিঃ <span id="badge-percent-collected" class="font-bold text-emerald-800 font-mono">০%</span></p>
+                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                  <div id="bar-percent-collected" class="bg-emerald-600 h-full rounded-full" style="width: 0%"></div>
+                </div>
+              </div>
+
+              <div>
+                <p class="flex justify-between text-slate-600 mb-1">বকেয়া কিস্তিঃ <span id="badge-percent-due" class="font-bold text-red-650 font-mono">০%</span></p>
+                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                  <div id="bar-percent-due" class="bg-red-500 h-full rounded-full" style="width: 0%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-3 bg-emerald-50 rounded-xl text-[10px] text-emerald-950 font-siliguri border border-emerald-100 mt-3">
+            💡 মোট আদায়ের ওপর ভিত্তি করে এটি রিয়েল-টাইম ক্যালকুলেট হচ্ছে। কোনো পরিবর্তনের পর স্বয়ংক্রিয়ভাবে ক্লাউড ও লোকাল মেমোরি রেজিস্টার সিঙ্ক হয়ে যাবে।
+          </div>
+
+          <button onclick="switchTab('payments')" class="w-full bg-emerald-50 border border-emerald-150 py-2.5 rounded-xl hover:bg-emerald-100 text-emerald-800 font-bold transition flex items-center justify-center gap-1.5 mt-4">
+            নতুন কালেকশন এন্ট্রি দিন <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- THREE HOME SPECIAL POOLS FOR IMMEDIATE ACTION -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+          <h4 class="text-sm font-bold text-slate-800 mb-3 border-b pb-2">প্রথম ৫ জন সদস্য</h4>
+          <div id="pool-first5" class="space-y-3.5 text-xs text-slate-700">
+            <!-- Populated from script -->
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+          <h4 class="text-sm font-bold text-slate-850 mb-3 border-b pb-2">সাম্প্রতিক কিস্তি জমাসমূহ</h4>
+          <div id="pool-recent-payments" class="space-y-3.5 text-xs text-slate-700">
+            <!-- Populated from script -->
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+          <h4 class="text-sm font-bold text-rose-800 mb-3 border-b pb-2">বকেয়া কিস্তির সদস্যদের তালিকা</h4>
+          <div id="pool-due-members" class="space-y-3.5 text-xs text-slate-705">
+            <!-- Populated from script -->
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- TAB 2: MEMBER MANAGEMENT -->
+    <section id="tab-members" class="tab-content space-y-6 hidden">
+      
+      <div class="bg-white p-5 rounded-2xl border border-emerald-100 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h3 class="text-lg font-bold text-slate-800">👥 সদস্য তালিকা ও শেয়ার বণ্টন</h3>
+          <p class="text-xs text-slate-500">ভাই ভাই সমিতির ক্যাশ বুক অনুযায়ী সকল সক্রিয় সদস্য</p>
+        </div>
+        <button onclick="openMemberModal()" class="bg-emerald-700 text-white rounded-xl px-4 py-2.5 hover:bg-emerald-800 text-xs font-bold transition flex items-center gap-1.5">
+          <i class="fa-solid fa-plus"></i> নতুন সদস্য তৈরি করুন
+        </button>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        <div class="p-4 bg-slate-50 border-b flex items-center gap-2">
+          <i class="fa-solid fa-magnifying-glass text-slate-400 text-xs"></i>
+          <input oninput="renderMembersList()" id="member-search" type="text" placeholder="মেম্বার কোড বা নাম দিয়ে খুঁজুন..." class="bg-transparent border-none focus:outline-none text-xs w-full text-slate-700">
+        </div>
+
+        <div id="members-cards-container" class="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Populated from script -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- TAB 3: PAYMENTS RECORD & LEDGER -->
+    <section id="tab-payments" class="tab-content space-y-6 hidden">
+      
+      <div class="bg-white p-5 rounded-2xl border border-emerald-100 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h3 class="text-lg font-bold text-slate-800">💰 কিস্তি আদায় খাতা</h3>
+          <p class="text-xs text-slate-500">পরিশোধিত সকল মেমোরিয়াল কিস্তি আদায়ের হিসেবপত্র</p>
+        </div>
+        <button onclick="openPaymentModal()" class="bg-emerald-700 text-white rounded-xl px-4 py-2.5 hover:bg-emerald-800 text-xs font-bold transition flex items-center gap-1.5">
+          <i class="fa-solid fa-plus"></i> কিস্তি পরিশোধ জমা করুন
+        </button>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        <div class="p-4 bg-slate-50 border-b flex items-center gap-2">
+          <i class="fa-solid fa-magnifying-glass text-slate-400 text-xs"></i>
+          <input oninput="renderPaymentsTable()" id="payment-search" type="text" placeholder="সদস্য নাম বা রসিদ কোড দিয়ে কিস্তি ট্র্যাক করুন..." class="bg-transparent border-none focus:outline-none text-xs w-full text-slate-700">
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs min-w-[700px] border-collapse">
+            <thead>
+              <tr class="bg-slate-50 text-slate-500 font-bold border-b text-[10px] tracking-wider uppercase">
+                <th class="p-4">রসিদ কোড</th>
+                <th className="p-4" style="padding: 16px;">সদস্য নাম ও কোড</th>
+                <th className="p-4" style="padding: 16px;">টাকার পরিমাণ</th>
+                <th className="p-4" style="padding: 16px;">উদ্দিষ্ট কিস্তির মাস</th>
+                <th className="p-4" style="padding: 16px;">পরিশোধ তারিখ</th>
+                <th className="p-4" style="padding: 16px;">স্ক্রিনশট / মেমো</th>
+                <th className="p-4" style="padding: 16px; text-align: right;">অ্যাকশন</th>
+              </tr>
+            </thead>
+            <tbody id="payments-tbody" class="divide-y text-slate-700 font-siliguri">
+              <!-- Populated from script -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- TAB 4: REPORTS AND DUES SHEET -->
+    <section id="tab-reports" class="tab-content space-y-6 hidden">
+      
+      <div class="bg-white p-5 rounded-2xl border border-emerald-100 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h3 class="text-lg font-bold text-slate-800">📋 বকেয়া ও অডিট রিপোর্ট শিট</h3>
+          <p class="text-xs text-slate-500">অনলাইন সমিতি ডাটাবেজ ফিল্টারিং ও রিমাইন্ডার</p>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="exportToCSV()" class="bg-slate-100 border text-slate-755 hover:bg-slate-205 text-xs font-bold p-2.5 px-4 rounded-xl transition flex items-center gap-1.5 text-slate-700">
+            <i class="fa-solid fa-file-excel text-green-700"></i> এক্সেল এক্সপোর্ট
+          </button>
+          <button onclick="window.print()" class="bg-emerald-700 text-white rounded-xl px-4 py-2.5 hover:bg-emerald-800 text-xs font-bold transition flex items-center gap-1.5">
+            <i class="fa-solid fa-print"></i> রিপোর্ট ও পেইজ প্রিন্ট
+          </button>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        <p class="p-4 bg-slate-50 text-slate-500 text-xs border-b">
+          * নিম্নে সমিতির বর্তমান তালিকাভুক্ত মেম্বারদের মোট জমা ও বকেয়ার বিবরণ দেয়া আছে। মেম্বার কোডের বিপরীতে নোটিশ বাটন ট্যাপ করে শেয়ারের কিস্তির তথ্য হোয়াটস্যাপ বা জেনারেটেড মেসেজে শেয়ার করুন।
+        </p>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs min-w-[700px] border-collapse">
+            <thead>
+              <tr class="bg-slate-50 text-slate-500 font-bold border-b text-[10px]">
+                <th className="p-4" style="padding: 16px;">সদস্যের নাম ও কোড</th>
+                <th className="p-4" style="padding: 16px;">মোবাইল</th>
+                <th className="p-4" style="padding: 16px;">শেয়ার সংখ্যা</th>
+                <th className="p-4" style="padding: 16px;">মোট পুঞ্জীভূত দাবি</th>
+                <th className="p-4" style="padding: 16px;">মোট সংগৃহীত সঞ্চয়</th>
+                <th className="p-4" style="padding: 16px;">মোট বকেয়ার পরিমাণ</th>
+                <th className="p-4" style="padding: 16px;">স্ট্যাটাস</th>
+                <th className="p-4" style="padding: 16px; text-align: right;">নোটিশ</th>
+              </tr>
+            </thead>
+            <tbody id="reports-tbody" class="divide-y text-slate-700">
+              <!-- Populated from script -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- TAB 5: GOAL ACHIEVEMT TIMELINE & MONTHS MAP -->
+    <section id="tab-progress" class="tab-content space-y-6 hidden">
+      
+      <div class="bg-white p-6 rounded-2xl border border-emerald-100 shadow-sm space-y-4">
+        <h3 class="text-lg font-black text-slate-800">📈 সমিতির লক্ষ্য ও আনুমানিক গরু ক্রয় মেকার</h3>
+        <p class="text-xs text-slate-500 leading-relaxed font-siliguri">
+          ভাই ভাই সমিতির প্রতিটি শেয়ারের কিস্তির পরিমাণ ৬০০ টাকা করে ১০ মাস মোট ৬০০০ টাকা। সম্মানিত সকল মেম্বারের মোট শেয়ারের অনুকূলে সংগৃহীত জমা ফান্ডের ওপর ভিত্তি করে গরু ক্রয়ের প্রগ্রেস এবং প্রতি সক্রিয় মাসের আদায় রেশিও নিচে প্রক্ষেপণ করা হয়েছেঃ
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 pt-2">
+          <div class="p-4.5 bg-slate-50 rounded-xl border text-center">
+            <p class="text-xs text-slate-400">মোট সক্রিয় শেয়ার সংখ্যা</p>
+            <p id="prog-total-shares" class="text-lg font-bold font-mono text-slate-900">0 টি</p>
+          </div>
+          <div class="p-4.5 bg-slate-50 rounded-xl border text-center">
+            <p class="text-xs text-slate-400">প্রতি মাসের প্রাক্কলিত সম্ভব্য সঞ্চয়</p>
+            <p id="prog-monthly-collection" class="text-lg font-bold font-mono text-emerald-800">0 ৳</p>
+          </div>
+          <div class="p-4.5 bg-slate-50 rounded-xl border text-center">
+            <p class="text-xs text-slate-400">১০ মাসের গরু ফান্ড বাজেট লক্ষ্য</p>
+            <p id="prog-target-cow" class="text-lg font-bold font-mono text-emerald-900">0 ৳</p>
+          </div>
+          <div class="p-4.5 bg-slate-50 rounded-xl border text-center">
+            <p class="text-xs text-slate-400">সর্বমোট সঞ্চিত নগদ অর্থ</p>
+            <p id="prog-collected-cow" class="text-lg font-bold font-mono text-emerald-950">0 ৳</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+        <h4 class="text-sm font-bold text-slate-800 mb-4">মাসিক সংগৃহীত আদায়ের চিত্র (মে ২০২৬ - এপ্রিল ২০২৭)</h4>
+        <div id="progress-months-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+          <!-- Populated from script -->
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- FIXED GLASS HEIGHT NAVIGATION FOR PORTABLE TAB MOBILE -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-emerald-950/95 backdrop-blur-md border-t border-emerald-800/80 p-2.5 flex items-center justify-around z-40 text-emerald-300">
+    <button onclick="switchTab('dashboard')" id="btn-dash-mobile" class="flex flex-col items-center gap-0.5 text-[10px] transition py-1 px-3.5 rounded-xl text-white bg-emerald-800 font-bold">
+      <i class="fa-solid fa-house mb-0.5"></i>
+      <span>হোম</span>
+    </button>
+    <button onclick="switchTab('members')" id="btn-members-mobile" class="flex flex-col items-center gap-0.5 text-[10px] transition py-1 px-3 rounded-xl opacity-80">
+      <i class="fa-solid fa-users mb-0.5"></i>
+      <span>সদস্য</span>
+    </button>
+    <button onclick="switchTab('payments')" id="btn-payments-mobile" class="flex flex-col items-center gap-0.5 text-[10px] transition py-1 px-3 rounded-xl opacity-80">
+      <i class="fa-solid fa-receipt mb-0.5"></i>
+      <span>কিস্তি</span>
+    </button>
+    <button onclick="switchTab('reports')" id="btn-reports-mobile" class="flex flex-col items-center gap-0.5 text-[10px] transition py-1 px-3 rounded-xl opacity-80">
+      <i class="fa-solid fa-chart-pie mb-0.5"></i>
+      <span>রিপোর্ট</span>
+    </button>
+    <button onclick="switchTab('progress')" id="btn-progress-mobile" class="flex flex-col items-center gap-0.5 text-[10px] transition py-1 px-3 rounded-xl opacity-80">
+      <i class="fa-solid fa-cow mb-0.5"></i>
+      <span>অগ্রগতি</span>
+    </button>
+  </nav>
+
+  <!-- ============================================== -->
+  <!-- MODAL: SWEETALERT OR PASSWORD VERIFIER CUSTOM BOX -->
+  <div id="passwordModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl p-6 max-w-sm w-full border border-emerald-100 shadow-2xl animate__animated animate__zoomIn">
+      <div class="flex items-center gap-3 text-emerald-800 mb-4">
+        <span class="p-2.5 bg-emerald-50 rounded-xl"><i class="fa-solid fa-lock text-emerald-700"></i></span>
+        <div>
+          <h4 class="font-bold text-slate-800">ক্যাশিয়ার পাসওয়ার্ড যাচাইকরণ</h4>
+          <p class="text-[10px] text-slate-400">এই অ্যাকশনটি সম্পাদন করতে পাসওয়ার্ড দিন</p>
+        </div>
+      </div>
+      <p id="password-modal-title" class="text-xs text-slate-600 mb-3 bg-emerald-50/50 p-2.5 rounded border border-emerald-100/40 font-semibold"></p>
+      
+      <div class="space-y-3">
+        <input id="password-input" type="password" placeholder="মাস্টার পাসওয়ার্ড দিন (972980)" class="w-full p-2.5 border border-slate-200 rounded-lg text-center text-sm font-mono tracking-widest focus:outline-none focus:border-emerald-500">
+        <p id="password-error-msg" class="text-[10px] text-red-600 font-semibold bg-red-50 p-1.5 rounded text-center hidden">❌ ভুল পাসওয়ার্ড! অনুগ্রহ করে সঠিক পাসওয়ার্ড দিন।</p>
+        
+        <div class="grid grid-cols-2 gap-2 text-xs pt-1">
+          <button onclick="closePasswordModal()" class="py-2.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg font-bold">বাতিল</button>
+          <button onclick="submitPasswordModal()" class="py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg font-bold shadow">অনুমোদন দিন</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: MEMBER CRUD ENROLL FORM -->
+  <div id="memberModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50 overflow-y-auto">
+    <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border border-slate-100 my-8">
+      <h4 id="member-modal-header" class="font-bold text-slate-800 text-md border-b pb-3 mb-4 text-emerald-950">নতুন সদস্য নিবন্ধন</h4>
+      <form id="member-form" onsubmit="submitMemberForm(event)" class="space-y-4 text-xs">
+        <input type="hidden" id="form-member-id">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[11px] text-slate-500 mb-1 font-bold">মেম্বার আইডি</label>
+            <input type="number" id="form-member-id-display" disabled class="w-full p-2 bg-slate-100 text-slate-500 border border-slate-200 rounded-lg font-bold font-mono">
+          </div>
+          <div>
+            <label class="block text-[11px] text-slate-500 mb-1 font-bold">শেয়ার সংখ্যা</label>
+            <select id="form-member-shares" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-bold font-mono">
+              <option value="1">১ শেয়ার (৬০০ ৳/মাস)</option>
+              <option value="2">২ শেয়ার (১২০০ ৳/মাস)</option>
+              <option value="3">৩ শেয়ার (১৮০০ ৳/মাস)</option>
+              <option value="5">৫ শেয়ার (৩০০০ ৳/মাস)</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[11px] text-slate-500 mb-1 font-bold">সদস্যের সম্পূর্ণ নাম</label>
+          <input type="text" id="form-member-name" placeholder="যেমন: জায়দুল হাসান" class="w-full p-2 border border-slate-200 rounded-lg text-slate-700" required>
+        </div>
+
+        <div>
+          <label class="block text-[11px] text-slate-500 mb-1 font-bold">মোবাইল নম্বর</label>
+          <input type="tel" id="form-member-mobile" placeholder="যেমন: ০১৬২৬৯৭২৯৮০" class="w-full p-2 border border-slate-200 rounded-lg font-mono text-slate-700" required>
+        </div>
+
+        <div>
+          <label class="block text-[11px] text-slate-500 mb-1 font-bold">যোগদানের তারিখ</label>
+          <input type="date" id="form-member-date" class="w-full p-2 border border-slate-200 rounded-lg font-mono text-slate-705" required>
+        </div>
+
+        <div>
+          <label class="block text-[11px] text-slate-500 mb-1 font-bold">মেম্বার ছবি (ঐচ্ছিক URL বা Base64)</label>
+          <input type="text" id="form-member-photo" placeholder="যেমন: https://example.com/avatar.png" class="w-full p-2 border border-slate-200 rounded-lg text-slate-707">
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 pt-2 border-t text-xs">
+          <button type="button" onclick="closeMemberModal()" class="py-2.5 bg-slate-100 text-slate-600 hover:bg-slate-202 rounded-lg font-bold">বাতিল</button>
+          <button type="submit" class="py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg font-bold shadow">সংরক্ষণ করুন</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: PAYMENT RECORD ENTRY -->
+  <div id="paymentModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50 overflow-y-auto">
+    <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border border-slate-100 my-8">
+      <h4 id="payment-modal-header" class="font-bold text-slate-800 text-md border-b pb-3 mb-4 text-emerald-950">নতুন কিস্তি সংগ্রহ</h4>
+      <form id="payment-form" onsubmit="submitPaymentForm(event)" class="space-y-4 text-xs">
+        <input type="hidden" id="form-payment-id">
+
+        <div>
+          <label class="block text-[11px] text-slate-500 mb-1 font-bold">পরিশোধকারী সদস্য</label>
+          <select id="form-payment-member" onchange="autoPopulatePaymentAmount()" class="w-full p-2.5 bg-white border border-slate-200 rounded-lg font-semibold" required>
+            <option value="">সদস্য নির্বাচন করুন...</option>
+            <!-- Filled via script -->
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[11px] text-slate-500 mb-1 font-bold">টাকার পরিমাণ (BDT)</label>
+            <input type="number" id="form-payment-amount" placeholder="600" class="w-full p-2 border border-slate-200 rounded-lg font-bold font-mono text-emerald-900 focus:outline-none" required>
+          </div>
+          <div>
+            <label class="block text-[11px] text-slate-500 mb-1 font-bold">উদ্দিষ্ট কিস্তির মাস</label>
+            <select id="form-payment-month" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-semibold">
+              <!-- Filled via script -->
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[11px] text-slate-500 mb-1 font-bold">পরিশোধের তারিখ</label>
+            <input type="date" id="form-payment-date" class="w-full p-2 border border-slate-200 rounded-lg font-mono text-slate-700" required>
+          </div>
+          <div>
+            <label class="block text-[11px] text-slate-500 mb-1 font-bold">মেমো বা নোট</label>
+            <input type="text" id="form-payment-note" placeholder="বিকাশ পরিশোধ, নগদ কাউন্টার ইত্যাদি" class="w-full p-2 border border-slate-200 rounded-lg text-slate-700">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[11px] text-slate-500 mb-1 font-bold">পেমেন্ট স্ক্রিনশট ইমেজ URL (ঐচ্ছিক)</label>
+          <input type="text" id="form-payment-screenshot" placeholder="যেমন: https://example.com/screenshot.jpg" class="w-full p-2 border border-slate-200 rounded-lg text-slate-700">
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 pt-2 border-t text-xs">
+          <button type="button" onclick="closePaymentModal()" class="py-2.5 bg-slate-100 text-slate-600 hover:bg-slate-202 rounded-lg font-bold">বাতিল</button>
+          <button type="submit" class="py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg font-bold shadow">কিস্তি জমা করুন</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: RECEIPT PDF MEMO DOCK -->
+  <div id="receiptModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-4 z-50 overflow-y-auto">
+    <div class="bg-white rounded-2xl p-6 max-w-lg w-full shadow-2xl border border-emerald-100">
+      <div class="flex justify-between items-center pb-3 border-b mb-4">
+        <span class="text-xs font-bold text-slate-500 uppercase">ভাই ভাই সমিতি পরিশোধ রশিদ মেমো</span>
+        <div class="flex gap-1.5">
+          <button onclick="window.print()" class="bg-emerald-700 text-white text-[10px] font-bold p-1 px-3 rounded flex items-center gap-1">
+            <i class="fa-solid fa-print"></i> প্রিন্ট করুন
+          </button>
+          <button onclick="closeReceiptModal()" class="bg-slate-100 text-slate-600 hover:bg-slate-200 text-[10px] font-bold p-1 px-2.5 rounded">বন্ধ</button>
+        </div>
+      </div>
+
+      <!-- Printable area -->
+      <div id="print-area-standalone" class="border border-double border-emerald-850 p-6 rounded-xl bg-gradient-to-tr from-emerald-50/20 via-white to-white select-text text-xs">
+        <div class="flex justify-between items-start border-b pb-4 mb-4">
+          <div class="flex items-center gap-2">
+            <div class="w-10 h-10 rounded-full bg-emerald-950 flex items-center justify-center text-emerald-400 font-bold"><i class="fa-solid fa-cow"></i></div>
+            <div>
+              <h2 class="text-base font-bold text-emerald-950">ভাই ভাই সমিতি</h2>
+              <p class="text-[9px] text-emerald-800 font-bold uppercase">সদস্য কিস্তি পরিশোধ মেমো রশিদ</p>
+            </div>
+          </div>
+          <div class="text-right text-[10px] leading-tight text-slate-550">
+            <p class="font-bold text-slate-900">সভাপতিঃ জায়দুল হাসান</p>
+            <p>01626972980</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div><p class="text-slate-400">রশিদ কোডঃ</p><p id="receipt-id" class="font-bold text-slate-900 font-mono text-sm">R-0000</p></div>
+          <div class="text-right"><p class="text-slate-400">পরিশোধের তারিখঃ</p><p id="receipt-date" class="font-bold text-slate-900 font-mono">0000-00-00</p></div>
+        </div>
+
+        <div class="bg-slate-50 rounded-xl p-4 border space-y-2 text-slate-700">
+          <div class="flex justify-between border-b pb-1"><span>সদস্যের নামঃ</span><span id="receipt-member-name" class="font-bold text-slate-900">-</span></div>
+          <div class="flex justify-between border-b pb-1"><span>স্থায়ী মেম্বার কোডঃ</span><span id="receipt-member-id" class="font-mono font-bold text-slate-900">-</span></div>
+          <div class="flex justify-between border-b pb-1"><span>শেয়ার সংখ্যাঃ</span><span id="receipt-shares" class="font-bold">-</span></div>
+          <div class="flex justify-between border-b pb-1"><span>উদ্দিষ্ট কিস্তির মাসঃ</span><span id="receipt-month" class="font-bold text-emerald-900">-</span></div>
+          <div class="flex justify-between font-bold text-emerald-900 bg-slate-200/50 p-2 rounded"><span>পরিশোধিত টাকার পরিমাণঃ</span><span id="receipt-amount" class="text-sm font-mono">-</span></div>
+        </div>
+
+        <div class="flex justify-between items-center text-[9px] mt-6 pt-3 border-t text-slate-500">
+          <div><p id="receipt-note">নোটঃ সফল কিস্তি আদায়।</p><p>Bhai Bhai Cooperative System Ledger - Auto Verified</p></div>
+          <div class="text-center font-bold border-t border-slate-350 pt-1 w-20">সভাপতির স্বাক্ষর</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: TEXT NOTICE MAKER -->
+  <div id="noticeModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl border">
+      <h4 class="font-bold text-slate-800 text-md border-b pb-2.5 mb-3 flex items-center gap-1.5"><i class="fa-solid fa-message text-emerald-700"></i> বকেয়া কিস্তির নোটিশ</h4>
+      <div class="space-y-4 text-xs">
+        <div class="bg-slate-50 p-3 rounded-lg space-y-1 text-slate-650 text-slate-600">
+          <p><b>সদস্য নামঃ</b> <span id="notice-member-name">-</span></p>
+          <p><b>মোবাইল নম্বরঃ</b> <span id="notice-member-mobile">-</span></p>
+          <p><b>মোট বকেয়ার পরিমাণঃ</b> <span id="notice-member-due" class="text-red-600 font-bold font-mono">- ৳</span></p>
+        </div>
+        
+        <div>
+          <label class="block text-slate-500 font-semibold mb-1">নোটিশের বিবরণঃ (ক্লিক করলে কপি হয়ে যাবে)</label>
+          <textarea id="notice-text-area" class="w-full h-24 p-2 border border-slate-200 rounded-lg focus:outline-none" readonly onclick="copyNoticeText()"></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 text-center font-bold">
+          <a id="btn-whatsapp-notice" target="_blank" class="py-2 bg-emerald-700 text-white rounded-lg flex items-center justify-center gap-1.5 text-xs hover:bg-emerald-800 transition"><i class="fa-brands fa-whatsapp"></i> হোয়াটসঅ্যাপ</a>
+          <a id="btn-sms-notice" class="py-2 bg-blue-600 text-white rounded-lg flex items-center justify-center gap-1.5 text-xs hover:bg-blue-700 transition"><i class="fa-solid fa-sms"></i> মোবাইল SMS</a>
+        </div>
+
+        <button onclick="closeNoticeModal()" class="w-full py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-600 font-bold text-xs">বন্ধ করুন</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Standalone Script integrations -->
+  <script src="app.js"></script>
+</body>
+</html>

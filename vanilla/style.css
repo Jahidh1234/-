@@ -1,0 +1,64 @@
+/* custom font implementation */
+* {
+  font-family: 'Hind Siliguri', sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Glassmorphism glass navigation bottom */
+#glass-bottom-navigation {
+  background: rgba(2, 44, 34, 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #047857;
+  border-radius: 10px;
+}
+
+/* Hide native controls on number input */
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
+
+/* Print CSS Configurations */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  aside, header, main, nav, button, select, input, .fixed {
+    display: none !important;
+  }
+  #receiptModal {
+    display: block !important;
+    position: static !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  #receiptModal .flex {
+    display: none !important;
+  }
+  #print-area-standalone, #print_area {
+    display: block !important;
+    width: 100% !important;
+    border: 1px solid #10b981 !important;
+    box-shadow: none !important;
+    padding: 20px !important;
+    margin: 0 !important;
+    background: white !important;
+    page-break-inside: avoid;
+  }
+}

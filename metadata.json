@@ -1,0 +1,6 @@
+{
+  "name": "ভাই ভাই সমিতি",
+  "description": "ভাই ভাই সমিতি - দ্রুত কিস্তি গ্রহণের পোর্টাল ও সঞ্চয় ব্যবস্থাপনা",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
